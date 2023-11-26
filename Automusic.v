@@ -22,6 +22,7 @@
 
 module Automusic(
  input clk,
+ input [2:0] mode,
  output reg pwm=1'b0
     );
     parameter do_low =190840 ;
@@ -69,6 +70,18 @@ module Automusic(
     reg play;
     reg stop;
     reg time_value;
+
+    always @(mode) begin
+    case(mode)
+    3'b001:melody_length=littleStar_length;
+    3'b010:melody_length=littleStar_length;
+    3'b100:melody_length=littleStar_length;
+    endcase
+    index <=1'b0;
+    isEnd<=1'b0;
+    isSlience<=1'b1;
+    tv_count<=1'b0;
+    end
 
     always @(posedge clk ) begin
         if (frequency!=0) begin
