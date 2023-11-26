@@ -72,15 +72,15 @@ module Automusic(
     reg time_value;
 
     always @(mode) begin
-    case(mode)
-    3'b001:melody_length=littleStar_length;
-    3'b010:melody_length=littleStar_length;
-    3'b100:melody_length=littleStar_length;
-    endcase
     index <=1'b0;
     isEnd<=1'b0;
     isSlience<=1'b1;
     tv_count<=1'b0;
+    case(mode)
+    3'b001:begin melody_length=littleStar_length;melody=littleStar;end
+    3'b010:begin melody_length=littleStar_length;melody=littleStar;end
+    3'b100:begin melody_length=littleStar_length;melody=littleStar; end
+    endcase
     end
 
     always @(posedge clk ) begin
