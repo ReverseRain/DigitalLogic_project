@@ -122,70 +122,70 @@ module Automusic(
         if (isSlience) frequency=0;
         else begin
             case (melody[index*6+5-:6])
-            6'd0: begin frequency=0;stop=stop_value_8;time_value=time_value_8;    end
-            6'd1: begin frequency=do;stop=stop_value_8;time_value=time_value_8;    end
-            6'd2: begin frequency=re;stop=stop_value_8;time_value=time_value_8;    end
-            6'd3: begin frequency=mi;stop=stop_value_8;time_value=time_value_8;    end
-            6'd4: begin frequency=fa;stop=stop_value_8;time_value=time_value_8;    end
-            6'd5: begin frequency=sol;stop=stop_value_8;time_value=time_value_8;    end
-            6'd6: begin frequency=la;stop=stop_value_8;time_value=time_value_8;    end
-            6'd7: begin frequency=si;stop=stop_value_8;time_value=time_value_8;    end
-            6'd8: begin frequency=do;stop=stop_value_4;time_value=time_value_4;    end
-            6'd9: begin frequency=re;stop=stop_value_4;time_value=time_value_4;    end
-            6'd10: begin frequency=mi;stop=stop_value_4;time_value=time_value_4;    end
-            6'd11: begin frequency=fa;stop=stop_value_4;time_value=time_value_4;    end
-            6'd12: begin frequency=sol;stop=stop_value_4;time_value=time_value_4;   end
-            6'd13: begin frequency=la;stop=stop_value_4;time_value=time_value_4;end    
-            6'd14: begin frequency=si;stop=stop_value_4;time_value=time_value_4;   end
-            6'd15: begin frequency=do;stop=stop_value_16;time_value=time_value_16;   end
-            6'd16: begin frequency=re;stop=stop_value_16;time_value=time_value_16;   end
-            6'd17: begin frequency=mi;stop=stop_value_16;time_value=time_value_16;   end
-            6'd18: begin frequency=fa;stop=stop_value_16;time_value=time_value_16;   end
-            6'd19: begin frequency=sol;stop=stop_value_16;time_value=time_value_16;   end
-            6'd20: begin frequency=la;stop=stop_value_16;time_value=time_value_16;   end
-            6'd21: begin frequency=si;stop=stop_value_16;time_value=time_value_16;   end 
-            6'd22: begin frequency=do_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd23: begin frequency=re_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd24: begin frequency=mi_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd25: begin frequency=fa_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd26: begin frequency=sol_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd27: begin frequency=la_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd28: begin frequency=si_low;stop=stop_value_8;time_value=time_value_8;    end
-            6'd29: begin frequency=do_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd30: begin frequency=re_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd31: begin frequency=mi_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd32: begin frequency=fa_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd33: begin frequency=sol_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd34: begin frequency=la_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd35: begin frequency=si_low;stop=stop_value_4;time_value=time_value_4;    end
-            6'd36: begin frequency=do_low;stop=stop_value_16;time_value=time_value_16;    end
-            6'd37: begin frequency=re_low;stop=stop_value_16;time_value=time_value_16;    end  
-            6'd38: begin frequency=mi_low;stop=stop_value_16;time_value=time_value_16;    end
-            6'd39: begin frequency=fa_low;stop=stop_value_16;time_value=time_value_16;    end
-            6'd40: begin frequency=sol_low;stop=stop_value_16;time_value=time_value_16;    end  
-            6'd41: begin frequency=la_low;stop=stop_value_16;time_value=time_value_16;    end  
-            6'd42: begin frequency=si_low;stop=stop_value_16;time_value=time_value_16;    end
-            6'd43: begin frequency=do_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd44: begin frequency=re_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd45: begin frequency=mi_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd46: begin frequency=fa_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd47: begin frequency=sol_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd48: begin frequency=la_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd49: begin frequency=si_high;stop=stop_value_8;time_value=time_value_8;    end 
-            6'd50: begin frequency=do_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd51: begin frequency=re_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd52: begin frequency=mi_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd53: begin frequency=fa_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd54: begin frequency=sol_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd55: begin frequency=la_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd56: begin frequency=si_high;stop=stop_value_4;time_value=time_value_4;   end
-            6'd57: begin frequency=do_high;stop=stop_value_16;time_value=time_value_16;   end
-            6'd58: begin frequency=re_high;stop=stop_value_16;time_value=time_value_16;   end
-            6'd59: begin frequency=mi_high;stop=stop_value_16;time_value=time_value_16;   end
-            6'd60: begin frequency=fa_high;stop=stop_value_16;time_value=time_value_16;   end
-            6'd61: begin frequency=sol_high;stop=stop_value_16;time_value=time_value_16;   end
-            6'd62: begin frequency=la_high;stop=stop_value_16;time_value=time_value_16;   end
-            6'd63: begin frequency=si_high;stop=stop_value_16;time_value=time_value_16;   end
+            6'd0: begin frequency=0;stop=stop_value_8;time_value=time_value_8;    end  //000000
+            6'd1: begin frequency=do;stop=stop_value_8;time_value=time_value_8;    end  //000001
+            6'd2: begin frequency=re;stop=stop_value_8;time_value=time_value_8;    end  //000010
+            6'd3: begin frequency=mi;stop=stop_value_8;time_value=time_value_8;    end  //000011
+            6'd4: begin frequency=fa;stop=stop_value_8;time_value=time_value_8;    end  //000100
+            6'd5: begin frequency=sol;stop=stop_value_8;time_value=time_value_8;    end //000101
+            6'd6: begin frequency=la;stop=stop_value_8;time_value=time_value_8;    end  //000110
+            6'd7: begin frequency=si;stop=stop_value_8;time_value=time_value_8;    end  //000111
+            6'd8: begin frequency=do;stop=stop_value_4;time_value=time_value_4;    end  //001000
+            6'd9: begin frequency=re;stop=stop_value_4;time_value=time_value_4;    end  //001001
+            6'd10: begin frequency=mi;stop=stop_value_4;time_value=time_value_4;    end //001010
+            6'd11: begin frequency=fa;stop=stop_value_4;time_value=time_value_4;    end //001011
+            6'd12: begin frequency=sol;stop=stop_value_4;time_value=time_value_4;   end //001100
+            6'd13: begin frequency=la;stop=stop_value_4;time_value=time_value_4;end    //001101
+            6'd14: begin frequency=si;stop=stop_value_4;time_value=time_value_4;   end //001110
+            6'd15: begin frequency=do;stop=stop_value_16;time_value=time_value_16;   end //001111
+            6'd16: begin frequency=re;stop=stop_value_16;time_value=time_value_16;   end //010000
+            6'd17: begin frequency=mi;stop=stop_value_16;time_value=time_value_16;   end //010001
+            6'd18: begin frequency=fa;stop=stop_value_16;time_value=time_value_16;   end //010010
+            6'd19: begin frequency=sol;stop=stop_value_16;time_value=time_value_16;   end //010011
+            6'd20: begin frequency=la;stop=stop_value_16;time_value=time_value_16;   end  //010100
+            6'd21: begin frequency=si;stop=stop_value_16;time_value=time_value_16;   end  //010101
+            6'd22: begin frequency=do_low;stop=stop_value_8;time_value=time_value_8;    end //010110
+            6'd23: begin frequency=re_low;stop=stop_value_8;time_value=time_value_8;    end //010111
+            6'd24: begin frequency=mi_low;stop=stop_value_8;time_value=time_value_8;    end //011000
+            6'd25: begin frequency=fa_low;stop=stop_value_8;time_value=time_value_8;    end //011001
+            6'd26: begin frequency=sol_low;stop=stop_value_8;time_value=time_value_8;    end //011010
+            6'd27: begin frequency=la_low;stop=stop_value_8;time_value=time_value_8;    end //011011
+            6'd28: begin frequency=si_low;stop=stop_value_8;time_value=time_value_8;    end //011100
+            6'd29: begin frequency=do_low;stop=stop_value_4;time_value=time_value_4;    end //011101
+            6'd30: begin frequency=re_low;stop=stop_value_4;time_value=time_value_4;    end //011110
+            6'd31: begin frequency=mi_low;stop=stop_value_4;time_value=time_value_4;    end //011111
+            6'd32: begin frequency=fa_low;stop=stop_value_4;time_value=time_value_4;    end //100000
+            6'd33: begin frequency=sol_low;stop=stop_value_4;time_value=time_value_4;    end //100001
+            6'd34: begin frequency=la_low;stop=stop_value_4;time_value=time_value_4;    end //100010
+            6'd35: begin frequency=si_low;stop=stop_value_4;time_value=time_value_4;    end //100011
+            6'd36: begin frequency=do_low;stop=stop_value_16;time_value=time_value_16;    end //100100
+            6'd37: begin frequency=re_low;stop=stop_value_16;time_value=time_value_16;    end  //100101
+            6'd38: begin frequency=mi_low;stop=stop_value_16;time_value=time_value_16;    end  //100110
+            6'd39: begin frequency=fa_low;stop=stop_value_16;time_value=time_value_16;    end  //100111
+            6'd40: begin frequency=sol_low;stop=stop_value_16;time_value=time_value_16;    end  //101000
+            6'd41: begin frequency=la_low;stop=stop_value_16;time_value=time_value_16;    end  //101001
+            6'd42: begin frequency=si_low;stop=stop_value_16;time_value=time_value_16;    end //101010
+            6'd43: begin frequency=do_high;stop=stop_value_8;time_value=time_value_8;    end //101011
+            6'd44: begin frequency=re_high;stop=stop_value_8;time_value=time_value_8;    end //101100
+            6'd45: begin frequency=mi_high;stop=stop_value_8;time_value=time_value_8;    end //101101
+            6'd46: begin frequency=fa_high;stop=stop_value_8;time_value=time_value_8;    end //101110
+            6'd47: begin frequency=sol_high;stop=stop_value_8;time_value=time_value_8;    end //101111
+            6'd48: begin frequency=la_high;stop=stop_value_8;time_value=time_value_8;    end //110000
+            6'd49: begin frequency=si_high;stop=stop_value_8;time_value=time_value_8;    end //110001
+            6'd50: begin frequency=do_high;stop=stop_value_4;time_value=time_value_4;   end //110010
+            6'd51: begin frequency=re_high;stop=stop_value_4;time_value=time_value_4;   end //110011
+            6'd52: begin frequency=mi_high;stop=stop_value_4;time_value=time_value_4;   end //110100
+            6'd53: begin frequency=fa_high;stop=stop_value_4;time_value=time_value_4;   end //110101
+            6'd54: begin frequency=sol_high;stop=stop_value_4;time_value=time_value_4;   end //110110
+            6'd55: begin frequency=la_high;stop=stop_value_4;time_value=time_value_4;   end //110111
+            6'd56: begin frequency=si_high;stop=stop_value_4;time_value=time_value_4;   end //111000
+            6'd57: begin frequency=do_high;stop=stop_value_16;time_value=time_value_16;   end //111001
+            6'd58: begin frequency=re_high;stop=stop_value_16;time_value=time_value_16;   end //111010
+            6'd59: begin frequency=mi_high;stop=stop_value_16;time_value=time_value_16;   end //111011
+            6'd60: begin frequency=fa_high;stop=stop_value_16;time_value=time_value_16;   end //111100
+            6'd61: begin frequency=sol_high;stop=stop_value_16;time_value=time_value_16;   end //111101
+            6'd62: begin frequency=la_high;stop=stop_value_16;time_value=time_value_16;   end //111110
+            6'd63: begin frequency=si_high;stop=stop_value_16;time_value=time_value_16;   end//111111
 
 
             
