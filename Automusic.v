@@ -22,6 +22,7 @@
 
 module Automusic(
  input clk,
+ input [2:0]mode,
  output reg pwm=1'b0
     );
     parameter do_low =190840 ;
