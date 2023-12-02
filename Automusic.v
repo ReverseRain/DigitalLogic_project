@@ -22,9 +22,13 @@
 
 module Automusic(
  input clk,
+ output reg pwm=1'b0,
  input [2:0]mode,
- output reg pwm=1'b0
+ output reg isHight,
+ output reg isLow,
+ output reg [6:0]  lights
     );
+     `include "parameter_projrct.v";
     parameter do_low =190840 ;
     parameter re_low =170068 ;
     parameter mi_low =151515 ;
@@ -84,10 +88,10 @@ module Automusic(
     reg time_value;
 
      always @(mode) begin
-    index <=1'b0;
-    isEnd<=1'b0;
-    isSlience<=1'b1;
-    tv_count<=1'b0;
+    index =1'b0;
+    isEnd=1'b0;
+    isSlience=1'b1;
+    tv_count=1'b0;
     
     case(mode)
     3'b001:begin melody_length=littleStar_length;melody=littleStar;end
@@ -123,6 +127,10 @@ module Automusic(
             else begin
                 tv_count<=0;
                 index<=index+1;
+                //就是在这里灯光也跟着变化
+                lights<=7'b0000000;
+                isHight<=1'b0;
+                isLow<=1'b0;
             end     
         end
         else begin
@@ -204,16 +212,31 @@ module Automusic(
             6'd61: begin frequency=sol_high;stop=stop_value_16;time_value=time_value_16;   end //111101
             6'd62: begin frequency=la_high;stop=stop_value_16;time_value=time_value_16;   end //111110
             6'd63: begin frequency=si_high;stop=stop_value_16;time_value=time_value_16;   end//111111
-
-
-            
-            
-
-
-
-
-
             endcase
+        //音符赋值后，灯光也赋值    
+        case(frequency)
+            do:begin lights=7'b1000000; isHight=1'b0;isLow=1'b0;end
+            re:begin lights=7'b0100000; isHight=1'b0;isLow=1'b0; end
+            mi:begin lights=7'b0010000;  isHight=1'b0;isLow=1'b0; end
+            fa:begin lights=7'b0001000;  isHight=1'b0;isLow=1'b0; end
+            sol:begin lights=7'b0000100;  isHight=1'b0;isLow=1'b0; end
+            la:begin lights=7'b0000010;  isHight=1'b0;isLow=1'b0; end
+            si:begin lights=7'b0000001;  isHight=1'b0;isLow=1'b0; end
+            do_high:begin lights=7'b1000000; isHight=1'b1;isLow=1'b0;end
+            re_high:begin lights=7'b0100000; isHight=1'b1;isLow=1'b0; end
+            mi_high:begin lights=7'b0010000;  isHight=1'b1;isLow=1'b0; end
+            fa_high:begin lights=7'b0001000;  isHight=1'b1;isLow=1'b0; end
+            sol_high:begin lights=7'b0000100;  isHight=1'b1;isLow=1'b0; end
+            la_high:begin lights=7'b0000010;  isHight=1'b1;isLow=1'b0; end
+            si_high:begin lights=7'b0000001;  isHight=1'b1;isLow=1'b0; end
+            do_low:begin lights=7'b1000000; isHight=1'b0;isLow=1'b1;end
+            re_low:begin lights=7'b0100000; isHight=1'b0;isLow=1'b1; end
+            mi_low:begin lights=7'b0010000;  isHight=1'b0;isLow=1'b1; end
+            fa_low:begin lights=7'b0001000;  isHight=1'b0;isLow=1'b1; end
+            sol_low:begin lights=7'b0000100;  isHight=1'b0;isLow=1'b1; end
+            la_low:begin lights=7'b0000010;  isHight=1'b0;isLow=1'b1; end
+            si_low:begin lights=7'b0000001;  isHight=1'b0;isLow=1'b1; end
+            endcase    
         end
         
     end
