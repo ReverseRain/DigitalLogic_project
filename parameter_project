@@ -1,0 +1,64 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/12/01 15:35:01
+// Design Name: 
+// Module Name: parameter_project
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+parameter do_low =190840 ;
+    parameter re_low =170068 ;
+    parameter mi_low =151515 ;
+    parameter fa_low =143266 ;
+    parameter sol_low =127551 ;
+    parameter la_low =113636 ;
+    parameter si_low =101215 ;
+
+
+    parameter do =95602 ;
+    parameter re =85179 ;
+    parameter mi =75873 ;
+    parameter fa =71633 ;
+    parameter sol =63776 ;
+    parameter la =56818 ;
+    parameter si =50607 ;
+
+    parameter do_high =47801 ;
+    parameter re_high =42553 ;
+    parameter mi_high =37936 ;
+    parameter fa_high =35791 ;
+    parameter sol_high =31888 ;
+    parameter la_high =28409 ;
+    parameter si_high =25304 ;
+    
+    parameter play_value_16 = 100*100000 ;
+        parameter stop_value_16 = 25*100000;
+        parameter time_value_16 = 125*100000; //0.125s
+    
+        parameter play_value_8 = 2*play_value_16 ;
+        parameter stop_value_8 = 2*stop_value_16;
+        parameter time_value_8 = 2*time_value_16; //0.25s
+    
+        parameter play_value_4 = 4*play_value_16 ;
+        parameter stop_value_4 = 4*stop_value_16;
+        parameter time_value_4 = 4*time_value_16; //0.5s
+    
+        parameter littleStar_length = 48;
+        parameter littleStar =288'b000000_001000_001001_001001_001010_001010_001011_001011_000000_001100_001101_001101_001100_001100_001000_001000_000000_001001_001010_001010_001011_001011_001100_001100_000000_001001_001010_001010_001011_001011_001100_001100_000000_001000_001001_001001_001010_001010_001011_001011_000000_001100_001101_001101_001100_001100_001000_001000;
+        parameter happyBirthday_length=30;
+        parameter happyBirthday=180'b001001_001001_001010_001000_001010_000100_000100_100010_100011_001000_001010_001100_011010_011010_001000_001000_001001_100001_100010_011010_011010_000000_100011_100011_001000_100001_100010_011010_011010_000000;
+        parameter happiness_length=55;//说好的幸福呢 副歌部分
+        parameter happiness=330'b101011_101111_101101_101110_101101_111010_111001_111001_111010_111010_111011_111011_111100_111001_111010_111001_111010_111010_111001_111010_111010_111001_111010_111010_111011_111011_111100_111100_111101_111010_111010_111010_101011_111011_101100_111010_111010_101100_111010_111010_101100_111001_010101_101100_111011_111011_101101_111011_111011_101101_111011_111011_101101_111010_111001;
+        
