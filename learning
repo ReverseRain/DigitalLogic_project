@@ -1,0 +1,55 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/12/01 15:38:29
+// Design Name: 
+// Module Name: learning
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module learning(
+input [2:0] mode,
+input clk,
+input [6:0] play,
+input ishigher,
+input islower,
+output wire isHight,
+output wire isLow,
+output wire [6:0]  lights,
+output wire pwm
+    );
+    `include "parameter_projrct.v";
+    reg match=1'b0;
+    reg[31:0] index=0;
+    reg tv_count=0;
+    reg isEnd=1'b0;
+    
+    Automusic auto(.clk(clk),.mode(mode),.isLow(isLow),.isAuto(false),
+     .isHight(isHight),.lights(lights),.isMatch(match));
+    music music(.ishigher(ishigher),.islower(islower),.clk(clk),.motes(play),.pwm(pwm));
+    
+    always @(play) begin
+    if(play==lights&&isHight==ishigher&&isLow==islower)//还有高音与低音
+    match=1'b1;//question!!
+    end
+    
+    always@(lights) begin
+    match=1'b0;
+    end
+
+    
+    
+endmodule
