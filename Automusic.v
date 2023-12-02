@@ -23,6 +23,8 @@
 module Automusic(
  input clk,
  output reg pwm=1'b0,
+ input isMatch,
+ input isAuto,
  input [2:0]mode,
  output reg isHight,
  output reg isLow,
@@ -116,7 +118,7 @@ module Automusic(
     always @(posedge clk ) begin
         if (index>=melody_length) isEnd<=1'b1;
         else isEnd<=1'b0;
-
+        if(isAuto==1'b1||(isMatch==1'b1&&isAuto==1'b0)) begin
         if (!isEnd) begin
             if (tv_count<stop) begin
                 isSlience<=1'b1;
@@ -139,8 +141,8 @@ module Automusic(
             tv_count<=0;
             index<=0;     
         end
-        tv_count=tv_count+1;
-
+        tv_count<=tv_count+1;
+end
         
     end
 
@@ -215,6 +217,7 @@ module Automusic(
             endcase
         //音符赋值后，灯光也赋值    
         case(frequency)
+             0:begin lights=7'b0000000; isHight=1'b0;isLow=1'b0;end
             do:begin lights=7'b1000000; isHight=1'b0;isLow=1'b0;end
             re:begin lights=7'b0100000; isHight=1'b0;isLow=1'b0; end
             mi:begin lights=7'b0010000;  isHight=1'b0;isLow=1'b0; end
