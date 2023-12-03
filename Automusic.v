@@ -25,36 +25,15 @@ module Automusic(
  output reg pwm=1'b0,
  input isMatch,
  input isAuto,
- input [2:0]mode,
+ input [1:0]mode,// the song number
  output reg isHight,
  output reg isLow,
- output reg [6:0]  lights
+ output [3:0] an,
+ output [6:0] led_light,
+ output reg[6:0]  lights
     );
-     `include "parameter_projrct.v";
-    parameter do_low =190840 ;
-    parameter re_low =170068 ;
-    parameter mi_low =151515 ;
-    parameter fa_low =143266 ;
-    parameter sol_low =127551 ;
-    parameter la_low =113636 ;
-    parameter si_low =101215 ;
+     `include "parameter_project.v"
 
-
-    parameter do =95602 ;
-    parameter re =85179 ;
-    parameter mi =75873 ;
-    parameter fa =71633 ;
-    parameter sol =63776 ;
-    parameter la =56818 ;
-    parameter si =50607 ;
-
-    parameter do_high =47801 ;
-    parameter re_high =42553 ;
-    parameter mi_high =37936 ;
-    parameter fa_high =35791 ;
-    parameter sol_high =31888 ;
-    parameter la_high =28409 ;
-    parameter si_high =25304 ;
     
     
     parameter play_value_16 = 100*100000 ;
@@ -73,7 +52,7 @@ module Automusic(
     parameter littleStar =288'b000000_001000_001001_001001_001010_001010_001011_001011_000000_001100_001101_001101_001100_001100_001000_001000_000000_001001_001010_001010_001011_001011_001100_001100_000000_001001_001010_001010_001011_001011_001100_001100_000000_001000_001001_001001_001010_001010_001011_001011_000000_001100_001101_001101_001100_001100_001000_001000;
     parameter happyBirthday_length=30;
     parameter happyBirthday=180'b001001_001001_001010_001000_001010_000100_000100_100010_100011_001000_001010_001100_011010_011010_001000_001000_001001_100001_100010_011010_011010_000000_100011_100011_001000_100001_100010_011010_011010_000000;
-    parameter happiness_length=55;//说好的幸福呢 副歌部分
+    parameter happiness_length=55;
     parameter happiness=330'b101011_101111_101101_101110_101101_111010_111001_111001_111010_111010_111011_111011_111100_111001_111010_111001_111010_111010_111001_111010_111010_111001_111010_111010_111011_111011_111100_111100_111101_111010_111010_111010_101011_111011_101100_111010_111010_101100_111010_111010_101100_111001_010101_101100_111011_111011_101101_111011_111011_101101_111011_111011_101101_111010_111001;
     
 
@@ -88,6 +67,11 @@ module Automusic(
     reg play;
     reg stop;
     reg time_value;
+    wire [1:0]modes;//auto mode
+    assign modes=auto;
+
+
+    LED led(clk,modes,mode,frequency,an,led_light);
 
      always @(mode) begin
     index =1'b0;
@@ -96,9 +80,9 @@ module Automusic(
     tv_count=1'b0;
     
     case(mode)
-    3'b001:begin melody_length=littleStar_length;melody=littleStar;end
-    3'b010:begin melody_length=happyBirthday_length;melody=happyBirthday;end
-    3'b100:begin melody_length=happiness_length;melody=happiness; end
+    song1:begin melody_length=littleStar_length;melody=littleStar;end
+    song2:begin melody_length=happyBirthday_length;melody=happyBirthday;end
+    song3:begin melody_length=happiness_length;melody=happiness; end
     endcase
     end
 
@@ -129,7 +113,7 @@ module Automusic(
             else begin
                 tv_count<=0;
                 index<=index+1;
-                //就是在这里灯光也跟着变化
+               
                 lights<=7'b0000000;
                 isHight<=1'b0;
                 isLow<=1'b0;
@@ -215,7 +199,6 @@ end
             6'd62: begin frequency=la_high;stop=stop_value_16;time_value=time_value_16;   end //111110
             6'd63: begin frequency=si_high;stop=stop_value_16;time_value=time_value_16;   end//111111
             endcase
-        //音符赋值后，灯光也赋值    
         case(frequency)
              0:begin lights=7'b0000000; isHight=1'b0;isLow=1'b0;end
             do:begin lights=7'b1000000; isHight=1'b0;isLow=1'b0;end
