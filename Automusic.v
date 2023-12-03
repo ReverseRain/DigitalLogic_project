@@ -113,10 +113,7 @@ module Automusic(
             else begin
                 tv_count<=0;
                 index<=index+1;
-               
-                lights<=7'b0000000;
-                isHight<=1'b0;
-                isLow<=1'b0;
+             
             end     
         end
         else begin
