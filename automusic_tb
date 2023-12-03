@@ -1,0 +1,40 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/12/03 19:15:54
+// Design Name: 
+// Module Name: automusic_tb
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module automusic_tb(
+
+    );
+   reg clk=1'b0,isMatch=1'b0,isAuto=1'b1,mode=2'b01;
+    wire [6:0]lights;
+    wire[31:0] frequency;
+    wire [31:0] index;
+    wire isSlience;
+     Automusic auto(.clk(clk),.isMatch(isMatch),.isAuto(isAuto),
+     .mode(mode),.lights(lights),.frequency(frequency)
+     ,.index(index),.isSlience(isSlience));
+       
+    initial begin
+    forever #5 clk=~clk;
+    
+    end
+endmodule
+
