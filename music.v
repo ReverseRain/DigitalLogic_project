@@ -25,36 +25,23 @@ input clk,
 input [6:0] notes,
 input ishigher,
 input islower,
-output reg pwm=1'b0
+output reg pwm=1'b0,
+output [3:0] an,
+output [6:0]light
     );
-    parameter do_low =190840 ;
-    parameter re_low =170068 ;
-    parameter mi_low =151515 ;
-    parameter fa_low =143266 ;
-    parameter sol_low =127551 ;
-    parameter la_low =113636 ;
-    parameter si_low =101215 ;
-
-
-    parameter do =95602 ;
-    parameter re =85179 ;
-    parameter mi =75873 ;
-    parameter fa =71633 ;
-    parameter sol =63776 ;
-    parameter la =56818 ;
-    parameter si =50607 ;
-
-    parameter do_high =47801 ;
-    parameter re_high =42553 ;
-    parameter mi_high =37936 ;
-    parameter fa_high =35791 ;
-    parameter sol_high =31888 ;
-    parameter la_high =28409 ;
-    parameter si_high =25304 ;
+    `include "parameter_project.v"
+   
 
 
     reg[31:0] frequency;
     reg[31:0] count=0;
+    wire[1:0] mode;
+
+    wire[1:0] num;
+    assign mode=free;
+    assign num=2'b00;
+    assign light=notes;
+    LED led(clk,mode,num,frequency,an,light);
     
     always @(posedge clk ) begin
         if (frequency!=0) begin
