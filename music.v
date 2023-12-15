@@ -22,42 +22,32 @@
 
 module music(
 input clk,
+input reset,
 input [6:0] notes,
 input ishigher,
 input islower,
-output reg pwm=1'b0,
+output  pwm,
 output [3:0] an,
-output [6:0]light
+output reg[6:0]light=0,
+output [6:0]ledlight
     );
-    `include "parameter_project.v"
+    `include "parameter_file.v"
    
 
 
     reg[31:0] frequency;
     reg[31:0] count=0;
-    wire[1:0] mode;
-
-    wire[1:0] num;
-    assign mode=free;
-    assign num=2'b00;
-    assign light=notes;
-    LED led(clk,mode,num,frequency,an,light);
+    reg[1:0] mode=free;
+    reg[1:0] num=2'b00;
+    LED led(clk,mode,num,frequency,an,ledlight);
+    Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset));
+     
     
-    always @(posedge clk ) begin
-        if (frequency!=0) begin
-            if (count<frequency) begin
-            count<=count+1;
-        end
-        else begin
-            pwm=~pwm;
-            count<=0;
-        end
-        end
-        else pwm=1'b0;
-        
-    end
+      
+   
 
     always @(*) begin
+       
         if (!ishigher&&!islower) begin
                 case (notes)
         7'b1000000:frequency=do; 
@@ -67,7 +57,7 @@ output [6:0]light
         7'b0000100:frequency=sol;
         7'b0000010:frequency=la;    
         7'b0000001:frequency=si; 
-        default:pwm=0;
+        default:frequency=0;
             endcase  
         end
         else if (ishigher&&!islower) begin
@@ -85,7 +75,7 @@ output [6:0]light
         
         7'b0000001:frequency=si_high;
          
-        default:pwm=0;
+        default:frequency=0;
             endcase
             
         end
@@ -104,12 +94,27 @@ output [6:0]light
          
         7'b0000001: frequency=si_low;
    
-        default:pwm=0;
+        default:frequency=0;
             endcase
             
         end
         
-        else  pwm=0;
+        else  frequency=0;
+
+        case (notes)
+        7'b1000000:light=7'b1000000;
+        7'b0100000:light=7'b0100000;
+        7'b0010000:light=7'b0010000;
+       
+        7'b0001000:light=7'b0001000;
+          
+        7'b0000100:light=7'b0000100;
+         
+        7'b0000010:light=7'b0000010;
+         
+        7'b0000001: light=7'b0000001;
+            default: light=0;
+        endcase
         
         
        
