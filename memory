@@ -1,0 +1,176 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/12/15 09:33:20
+// Design Name: 
+// Module Name: memory
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module memory(
+input clk, 
+input [6:0] notes,
+input ishigher,
+input islower,
+input stopLoad
+    );
+    `include "parameter_project.v";
+    reg[6:0] my_memory[99:0];
+    reg[3:0] num[0:0];
+    reg index=0;
+    reg [31:0]frequency;
+    reg [31:0]last_frequency;
+    reg[31:0] tv_count=0;
+    
+        
+
+    
+    
+    always @(*) begin
+    if(stopLoad==1'b1) begin
+    $readmemh("num_library",num);
+    $fwrite("music_library"+num[0],my_memory);
+    $fwrite("num_library",num);
+    end
+    end
+    
+    always @(ishigher,islower,notes) begin
+            if (!ishigher&&!islower) begin
+                    case (notes)
+            7'b1000000:frequency=do;
+            7'b0100000:frequency=re; 
+            7'b0010000:frequency=mi;
+            7'b0001000:frequency=fa;  
+            7'b0000100:frequency=sol;
+            7'b0000010:frequency=la;    
+            7'b0000001:frequency=si;
+                endcase  
+            end
+            else if (ishigher&&!islower) begin
+                         case (notes)
+            7'b1000000: frequency=do_high;
+            7'b0100000:frequency=re_high;
+            7'b0010000:frequency=mi_high;
+            7'b0001000:frequency=fa_high;
+            7'b0000100:frequency=sol_high;
+            7'b0000010:frequency=la_high;
+            7'b0000001:frequency=si_high;
+                endcase
+            end
+            else if (!ishigher&&islower) begin
+                case (notes)
+            7'b1000000:frequency=do_low;
+            7'b0100000:frequency=re_low;
+            7'b0010000:frequency=mi_low;
+            7'b0001000:frequency=fa_low;
+            7'b0000100:frequency=sol_low;
+            7'b0000010:frequency=la_low;
+            7'b0000001: frequency=si_low;
+                endcase
+            end
+         end
+    
+    
+    always@(posedge clk) begin
+    if(last_frequency!=frequency) begin
+    if(tv_count<=time_value_16) begin
+            case(last_frequency)
+            do:my_memory[index]=6'b001111;
+            re:my_memory[index]=6'b010000;
+            mi:my_memory[index]=6'b010001;
+            fa:my_memory[index]=6'b010010;
+            sol:my_memory[index]=6'b010011;
+            la:my_memory[index]=6'b010100;
+            si:my_memory[index]=6'b010101;
+            do_low:my_memory[index]=6'b100100;
+            re_low:my_memory[index]=6'b100101;
+            mi_low:my_memory[index]=6'b100110;
+            fa_low:my_memory[index]=6'b100111;
+            sol_low:my_memory[index]=6'b101000;
+            la_low:my_memory[index]=6'b101001;
+            si_low:my_memory[index]=6'b101010;
+            do_high:my_memory[index]=6'b111001;
+            re_high:my_memory[index]=6'b111010;
+            mi_high:my_memory[index]=6'b111011;
+            fa_high:my_memory[index]=6'b111100;
+            sol_high:my_memory[index]=6'b111101;
+            la_high:my_memory[index]=6'b111110;
+            si_high:my_memory[index]=6'b111111;
+            default
+            my_memory[index]=6'b000000;
+            endcase
+            end
+            else if(time_value_16<tv_count&&tv_count<=time_value_8)begin
+            case(last_frequency)
+                    do:my_memory[index]=6'b000001;
+                    re:my_memory[index]=6'b000010;
+                    mi:my_memory[index]=6'b000011;
+                    fa:my_memory[index]=6'b000100;
+                    sol:my_memory[index]=6'b000101;
+                    la:my_memory[index]=6'b000110;
+                    si:my_memory[index]=6'b000111;
+                    do_low:my_memory[index]=6'b010110;
+                    re_low:my_memory[index]=6'b010111;
+                    mi_low:my_memory[index]=6'b011000;
+                    fa_low:my_memory[index]=6'b011001;
+                    sol_low:my_memory[index]=6'b011010;
+                    la_low:my_memory[index]=6'b011011;
+                    si_low:my_memory[index]=6'b011100;
+                    do_high:my_memory[index]=6'b101011;
+                    re_high:my_memory[index]=6'b101100;
+                    mi_high:my_memory[index]=6'b101101;
+                    fa_high:my_memory[index]=6'b101110;
+                    sol_high:my_memory[index]=6'b101111;
+                    la_high:my_memory[index]=6'b110000;
+                    si_high:my_memory[index]=6'b110001;          
+                    default
+                    my_memory[index]=6'b000000;
+                    endcase
+                    end
+          else if(time_value_8<tv_count)begin
+                    case(last_frequency)
+                    do:my_memory[index]=6'b001000;
+                    re:my_memory[index]=6'b001001;
+                    mi:my_memory[index]=6'b001010;
+                    fa:my_memory[index]=6'b001011;
+                   sol:my_memory[index]=6'b001100;
+                    la:my_memory[index]=6'b001101;
+                    si:my_memory[index]=6'b001110;
+                    do_low:my_memory[index]=6'b011101;
+                    re_low:my_memory[index]=6'b011110;
+                    mi_low:my_memory[index]=6'b011111;
+                    fa_low:my_memory[index]=6'b100000;
+                    sol_low:my_memory[index]=6'b100001;
+                    la_low:my_memory[index]=6'b100010;
+                    si_low:my_memory[index]=6'b100011;
+                    do_high:my_memory[index]=6'b110010;
+                    re_high:my_memory[index]=6'b110011;
+                    mi_high:my_memory[index]=6'b110100;
+                    fa_high:my_memory[index]=6'b110101;
+                    sol_high:my_memory[index]=6'b110110;
+                    la_high:my_memory[index]=6'b110111;
+                    si_high:my_memory[index]=6'b111000;                              
+               endcase
+           end
+           tv_count=0;
+           last_frequency=frequency;
+           end
+           else begin
+           tv_count<=tv_count+1;
+           end
+    end    
+    
+endmodule
