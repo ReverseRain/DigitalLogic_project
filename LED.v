@@ -28,6 +28,7 @@ module LED(
     output reg[3:0] an,
     output reg[6:0] a_g//bond a to g from left to right
 
+
     );
     `include "parameter_file.v"
     reg[18:0] clkdiv=0;
@@ -55,6 +56,7 @@ module LED(
              free: display=4'd7;
              auto: display=4'd8;
              learn: display=4'd9;
+             select: display=4'd4;
              default:display=4'd12;
             endcase
 
@@ -70,12 +72,22 @@ module LED(
 
             endcase
             end
-            else display=4'd2;
+            else if (mode==select) begin
+                display=4'd13;
+            end
+            else begin
+                 display=4'd12;
+            end
+               
             
             
         end
         else if (sign==2'b10) begin
-            case(fre)
+            if (mode==select) begin
+                display=4'd9;
+            end
+            else begin
+                case(fre)
             do,do_high,do_low: display=4'd0;
             re,re_high,re_low: display=4'd1;
             mi,mi_high,mi_low: display=4'd2;
@@ -86,15 +98,22 @@ module LED(
             default:display=4'd12;
 
             endcase
+            end
+            
             
         end
         else if (sign==2'b11) begin
-            case(fre)
+            if (mode==select) begin
+                display=4'd13;
+            end
+            else begin
+               case(fre)
             do,re,mi,fa,sol,la,si:display=4'd11;
             do_low,re_low,mi_low,fa_low,sol_low,la_low,si_low:display=4'd9;
             do_high,re_high,mi_high,fa_high,sol_high,la_high,si_high:display=4'd10;
             default:display=4'd12;
-            endcase
+            endcase 
+            end
             
         end
 
@@ -113,7 +132,8 @@ module LED(
         4'd9:a_g=7'b0001110;//L
         4'd10:a_g=7'b0110111;//H
         4'd11:a_g=7'b0000001;//-
-        4'd12:a_g=7'b1111110;//0   
+        4'd12:a_g=7'b1111110;//0
+        4'd13:a_g=7'b1001111;//E   
         
             default:a_g=7'b1111110;//0 
         endcase
