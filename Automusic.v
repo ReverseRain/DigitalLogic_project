@@ -22,7 +22,9 @@
 
 module Automusic(
  input clk,
- output reg pwm=1'b0,
+ input reset,
+ 
+ output pwm,
  input isMatch,
  input isAuto,
  input [1:0]mode,// the song number
@@ -31,29 +33,21 @@ module Automusic(
  output [3:0] an,
  output [6:0] led_light,
  output reg[6:0]  lights
+//  output reg[31:0] index=0,
+//  output reg isSlience=1'b1,
+//  output reg[31:0] tv_count=0,
+//  output integer time_value=50,
+//  output reg [31:0]melody_length,
+//  output integer  stop=10,
+//  output reg isEnd=1'b0,
+//  output reg[31:0] frequency
+ 
     );
-     `include "parameter_project.v"
+     `include "parameter_file.v"
 
     
     
-    parameter play_value_16 = 100*100000 ;
-    parameter stop_value_16 = 25*100000;
-    parameter time_value_16 = 125*100000; //0.125s
-
-    parameter play_value_8 = 2*play_value_16 ;
-    parameter stop_value_8 = 2*stop_value_16;
-    parameter time_value_8 = 2*time_value_16; //0.25s
-
-    parameter play_value_4 = 4*play_value_16 ;
-    parameter stop_value_4 = 4*stop_value_16;
-    parameter time_value_4 = 4*time_value_16; //0.5s
-
-    parameter littleStar_length = 48;
-    parameter littleStar =288'b000000_001000_001001_001001_001010_001010_001011_001011_000000_001100_001101_001101_001100_001100_001000_001000_000000_001001_001010_001010_001011_001011_001100_001100_000000_001001_001010_001010_001011_001011_001100_001100_000000_001000_001001_001001_001010_001010_001011_001011_000000_001100_001101_001101_001100_001100_001000_001000;
-    parameter happyBirthday_length=30;
-    parameter happyBirthday=180'b001001_001001_001010_001000_001010_000100_000100_100010_100011_001000_001010_001100_011010_011010_001000_001000_001001_100001_100010_011010_011010_000000_100011_100011_001000_100001_100010_011010_011010_000000;
-    parameter happiness_length=55;
-    parameter happiness=330'b101011_101111_101101_101110_101101_111010_111001_111001_111010_111010_111011_111011_111100_111001_111010_111001_111010_111010_111001_111010_111010_111001_111010_111010_111011_111011_111100_111100_111101_111010_111010_111010_101011_111011_101100_111010_111010_101100_111010_111010_101100_111001_010101_101100_111011_111011_101101_111011_111011_101101_111011_111011_101101_111010_111001;
+   
     
 
     reg[31:0] frequency;
@@ -63,15 +57,14 @@ module Automusic(
     reg isSlience=1'b1;
     reg isEnd=1'b0;
     reg [2000:0]melody;
-    reg melody_length;
-    reg play;
-    reg stop;
-    reg time_value;
-    wire [1:0]modes;//auto mode
-    assign modes=auto;
+    reg [31:0]melody_length;
+    integer  stop=10;
+    integer  time_value=50;
+    reg[1:0] modes=auto;
 
 
     LED led(clk,modes,mode,frequency,an,led_light);
+    Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset));
 
      always @(mode) begin
     index =1'b0;
@@ -86,21 +79,16 @@ module Automusic(
     endcase
     end
 
-    always @(posedge clk ) begin
-        if (frequency!=0) begin
-            if (fre_count<frequency) begin
-            fre_count<=fre_count+1;
+    
+    always @(posedge clk,posedge reset) begin
+        if (reset) begin
+            tv_count=0;
+            index=0;     
+            isEnd=1'b0;
+            isSlience=1'b1;
         end
         else begin
-            pwm=~pwm;
-            fre_count<=0;
-        end
-        end
-        else pwm=1'b0;  
-    end//single notes counter
-
-    always @(posedge clk ) begin
-        if (index>=melody_length) isEnd<=1'b1;
+            if (index>=melody_length) isEnd<=1'b1;
         else isEnd<=1'b0;
         if(isAuto==1'b1||(isMatch==1'b1&&isAuto==1'b0)) begin
         if (!isEnd) begin
@@ -110,20 +98,23 @@ module Automusic(
             else if (tv_count>=stop&&tv_count<time_value) begin
                 isSlience<=1'b0;
             end
-            else begin
-                tv_count<=0;
-                index<=index+1;
-             
+            else if(tv_count>=time_value) begin
+                tv_count=32'h0000;
+                index=index+1'b1;
+                
             end     
         end
         else begin
-            isEnd<=1'b0;
-            isSlience<=1'b1;
-            tv_count<=0;
-            index<=0;     
+            
+            tv_count=0;
+            index=0;     
+            isEnd=1'b0;
+            isSlience=1'b1;
         end
-        tv_count<=tv_count+1;
+        tv_count<=tv_count+1'b1;
 end
+        end
+        
         
     end
 
@@ -196,6 +187,7 @@ end
             6'd62: begin frequency=la_high;stop=stop_value_16;time_value=time_value_16;   end //111110
             6'd63: begin frequency=si_high;stop=stop_value_16;time_value=time_value_16;   end//111111
             endcase
+           
         case(frequency)
              0:begin lights=7'b0000000; isHight=1'b0;isLow=1'b0;end
             do:begin lights=7'b1000000; isHight=1'b0;isLow=1'b0;end
