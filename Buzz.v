@@ -25,12 +25,18 @@ module Buzz(
     input clk,
     input [31:0] frequency,
     input reset,
+    input modechange,
     output reg pwm
 
     );
     reg[31:0] count;
-    always @(posedge clk ,posedge reset) begin
-        if (reset) begin
+    always @(posedge clk ,negedge reset) begin
+        if (modechange) begin
+            pwm=1'b0;
+            count=0;
+        end
+
+        if (!reset) begin
             pwm=1'b0;
             count=0;
         end
