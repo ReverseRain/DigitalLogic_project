@@ -22,17 +22,20 @@
 
 module Automusic(
  input clk,
- input reset,
+ input  reset,
+ input modechange,
  
  output pwm,
+ output reg o=1'b0,
  input isMatch,
  input isAuto,
- input [1:0]mode,// the song number
- output reg isHight,
- output reg isLow,
- output [3:0] an,
- output [6:0] led_light,
- output reg[6:0]  lights
+ input [1:0]present_song,// the song number
+  output reg isHight,
+  output reg isLow,
+  output [3:0] an,
+  output [6:0] led_light,
+  output reg[6:0]  lights
+
 //  output reg[31:0] index=0,
 //  output reg isSlience=1'b1,
 //  output reg[31:0] tv_count=0,
@@ -45,47 +48,61 @@ module Automusic(
     );
      `include "parameter_file.v"
 
-    
+   
     
    
     
 
     reg[31:0] frequency;
-    reg[31:0] fre_count=0;
-    reg[31:0] tv_count=0;
-    reg[31:0] index=0;
-    reg isSlience=1'b1;
-    reg isEnd=1'b0;
+    reg[31:0] tv_count;
+    reg[31:0] index;
+    reg isSlience;
+    reg isEnd;
     reg [2000:0]melody;
     reg [31:0]melody_length;
-    integer  stop=10;
-    integer  time_value=50;
+    reg[31:0]  stop;
+    reg[31:0]  time_value;
     reg[1:0] modes=auto;
 
 
     LED led(clk,modes,mode,frequency,an,led_light);
-    Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset));
+    Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset),.modechange(modechange));
 
-     always @(mode) begin
-    index =1'b0;
-    isEnd=1'b0;
-    isSlience=1'b1;
-    tv_count=1'b0;
+    reg[1:0] last_song;
     
-    case(mode)
-    song1:begin melody_length=littleStar_length;melody=littleStar;end
-    song2:begin melody_length=happyBirthday_length;melody=happyBirthday;end
-    song3:begin melody_length=happiness_length;melody=happiness; end
-    endcase
-    end
 
     
-    always @(posedge clk,posedge reset) begin
-        if (reset) begin
+    always @(posedge clk,negedge reset) begin
+        if (last_song!=present_song) begin
+            last_song=present_song;
+            case (present_song)
+               song1: begin melody_length=littleStar_length;melody=littleStar; end
+               song2:begin melody_length=happyBirthday_length;melody=happyBirthday;end
+               song3:begin melody_length=happiness_length;melody=happiness; end
+            endcase
+        end
+
+        if (modechange) begin
+             tv_count=0;
+            index=0;     
+            isEnd=1'b0;
+            isSlience=1'b1;
+            melody_length=littleStar_length;
+            melody=littleStar;
+            last_song=song1;
+        end
+
+
+        if (!reset) begin
             tv_count=0;
             index=0;     
             isEnd=1'b0;
             isSlience=1'b1;
+            melody_length=littleStar_length;
+            melody=littleStar;
+            last_song=song1;
+        
+
         end
         else begin
             if (index>=melody_length) isEnd<=1'b1;
@@ -119,7 +136,11 @@ end
     end
 
     always @(*) begin
-        if (isSlience) frequency=0;
+        if (isSlience) begin
+            frequency=0;
+            // stop=10;
+            // time_value=50;
+        end
         else begin
             case (melody[index*6+5-:6])
             6'd0: begin frequency=0;stop=stop_value_8;time_value=time_value_8;    end  //000000
