@@ -32,21 +32,23 @@ output wire isLow,
 output wire [6:0]  lights,
 output wire pwm,
 output [3:0] an,
-output wire [6:0] led_light
-//output reg match,
+output wire [6:0] led_light,
+output reg match,
+output wire isEnd
 //output reg [6:0]  last_lights,
 //output wire [31:0] index
     );
-    `include "parameter_project.v";
-    
+    `include "parameter_project.v"
+    //no sound?
     reg tv_count=0;
-    reg isEnd;
+//    reg isEnd;
     reg [6:0]last_play;
     reg [31:0] last_index=0;
-    reg match;
+//    reg match;
     wire[31:0]index;
     Automusic auto1(.clk(clk),.present_song(mode),.isLow(isLow),.isAuto(false),
-        .isHight(isHight),.lights(lights),.an(an),.isMatch(match),.led_light(led_light),.index(index));
+        .isHight(isHight),.lights(lights),.an(an),.isMatch(match)
+        ,.led_light(led_light),.index(index),.reset(reset),.isEnd(isEnd));
     music music(.ishigher(ishigher),.islower(islower),.clk(clk),.notes(play),.pwm(pwm));
     
     
