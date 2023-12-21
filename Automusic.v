@@ -34,7 +34,8 @@ module Automusic(
   output reg isLow,
   output [3:0] an,
   output [6:0] led_light,
-  output reg[6:0]  lights
+  output reg[6:0]  lights,
+  output reg[31:0] index,
 
 //  output reg[31:0] index=0,
 //  output reg isSlience=1'b1,
@@ -42,30 +43,30 @@ module Automusic(
 //  output integer time_value=50,
 //  output reg [31:0]melody_length,
 //  output integer  stop=10,
-//  output reg isEnd=1'b0,
+  output reg isEnd
 //  output reg[31:0] frequency
  
     );
-     `include "parameter_file.v"
+     `include "parameter_project.v"
 
    
     
    
     
-
+    reg[31:0] true_frequency;
     reg[31:0] frequency;
     reg[31:0] tv_count;
-    reg[31:0] index;
     reg isSlience;
-    reg isEnd;
+//    reg isEnd;
     reg [2000:0]melody;
     reg [31:0]melody_length;
     reg[31:0]  stop;
     reg[31:0]  time_value;
-    reg[1:0] modes=auto;
+    reg[1:0] modes;
+    reg[31:0] gap_time;
 
 
-    LED led(clk,modes,mode,frequency,an,led_light);
+    LED led(clk,modes,present_song,frequency,an,led_light);
     Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset),.modechange(modechange));
 
     reg[1:0] last_song;
@@ -80,8 +81,23 @@ module Automusic(
                song2:begin melody_length=happyBirthday_length;melody=happyBirthday;end
                song3:begin melody_length=happiness_length;melody=happiness; end
             endcase
+            gap_time=0;
+            tv_count=0;
+            index=0;     
+            isEnd=1'b0;
+            isSlience=1'b1;
         end
-
+        //how to stop?
+        if(isAuto==1'b0&&isEnd==1'b0) modes=learn;
+        else if(isAuto==1'b1) modes=auto;
+        else if(isAuto==1'b0&&isEnd==1'b1)begin
+        if(gap_time<900000000)
+        modes=auto;
+        else if(gap_time<2000000000)
+        modes=free;
+        else
+        modes=learn;
+        end
         if (modechange) begin
              tv_count=0;
             index=0;     
@@ -90,6 +106,7 @@ module Automusic(
             melody_length=littleStar_length;
             melody=littleStar;
             last_song=song1;
+            gap_time=0;
         end
 
 
@@ -101,8 +118,6 @@ module Automusic(
             melody_length=littleStar_length;
             melody=littleStar;
             last_song=song1;
-        
-
         end
         else begin
             if (index>=melody_length) isEnd<=1'b1;
@@ -117,21 +132,26 @@ module Automusic(
             end
             else if(tv_count>=time_value) begin
                 tv_count=32'h0000;
-                index=index+1'b1;
-                
+                index=index+1'b1;                                       
             end     
         end
-        else begin
-            
+        else if(isAuto==1'b1) begin
             tv_count=0;
             index=0;     
             isEnd=1'b0;
             isSlience=1'b1;
         end
+      else if(isAuto==1'b0) begin
+      tv_count=0;
+      index=0;
+      isSlience=1'b1;
+      end
         tv_count<=tv_count+1'b1;
 end
+else if(isMatch==1'b0&&isAuto==1'b0)begin
+gap_time<=gap_time+1;
         end
-        
+    end    
         
     end
 
@@ -232,15 +252,9 @@ end
             sol_low:begin lights=7'b0000100;  isHight=1'b0;isLow=1'b1; end
             la_low:begin lights=7'b0000010;  isHight=1'b0;isLow=1'b1; end
             si_low:begin lights=7'b0000001;  isHight=1'b0;isLow=1'b1; end
-            endcase    
+            endcase 
+//            true_frequency=frequency;   
         end
         
     end
-
-    
-
-
-
-
-
 endmodule
