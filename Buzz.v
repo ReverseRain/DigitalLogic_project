@@ -23,13 +23,13 @@
 module Buzz(
 
     input clk,
-    input [31:0] frequency,
+    input [31:0] frequency, // the frequency of the sound
     input reset,
     input modechange,
-    output reg pwm
+    output reg pwm // the output signal
 
     );
-    reg[31:0] count;
+    reg[31:0] count; //  counts the times of clk to produce the Proper frequency
     always @(posedge clk ,negedge reset) begin
         if (modechange) begin
             pwm=1'b0;
