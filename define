@@ -1,0 +1,89 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/12/19 19:19:03
+// Design Name: 
+// Module Name: definite
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module definite(
+input clk,
+input [6:0] play,
+input reset,
+input ishigher,
+input islower,
+input enable,
+input confirm,
+//add an enable 
+output reg [6:0]lights,
+output wire pwm,
+output wire [3:0] an,
+output wire [6:0] led_light
+    );
+    wire[6:0]trueLight;
+    reg [6:0]trueNote;
+    music music(.notes(trueNote),.clk(clk),.reset(reset),
+           .islower(islower),.ishigher(ishigher),
+           .light(trueLight),.ledlight(led_light),.an(an),
+           .pwm(pwm),.isdefine(true),.ismemory(false));
+    
+    reg  [6:0] key_index;
+    reg  [6:0] key_map;
+     `include "parameter_project.v";
+     reg[6:0]newnote[6:0];
+    reg [6:0]last_play; 
+    reg [31:0]index;              
+      
+       always @(posedge clk or negedge reset ) begin
+       if (!reset) begin
+       key_map <= 7'b1000000;
+       last_play <= 7'b0000000;
+       lights<=7'b1000000;
+       index<=0;
+       end
+       else if(enable==1'b1) begin
+       if(key_map!=7'b0000000)begin
+       if(last_play!=play) begin
+       if(confirm==1'b1) begin
+       key_map<=key_map>>1;
+       lights<=lights>>1;
+       end
+       else if(confirm==1'b0&&play!=7'b0000000)begin
+       newnote[index]<=play;
+       index<=index+1;
+       end
+       end
+       last_play<=play;
+       end
+       else if(play!=last_play) begin
+       case(play)
+       newnote[0]:trueNote<=7'b1000000;
+       newnote[1]:trueNote<=7'b0100000;
+       newnote[2]:trueNote<=7'b0010000;
+       newnote[3]:trueNote<=7'b0001000;
+       newnote[4]:trueNote<=7'b0000100;
+       newnote[5]:trueNote<=7'b0000010;
+       newnote[6]:trueNote<=7'b0000001;
+       default trueNote<=7'b0000000;                           
+       endcase
+       last_play<=play;
+       lights<=play;
+       end
+       end
+       end
+       
+endmodule
