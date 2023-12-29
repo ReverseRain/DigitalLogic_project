@@ -55,15 +55,15 @@ module Automusic(
     
     reg[31:0] true_frequency;
     reg[31:0] frequency;
-    reg[31:0] tv_count;
+ reg[31:0] tv_count; //The counter computes the time of every notes
     reg isSlience;
 //    reg isEnd;
     reg [2000:0]melody;
     reg [31:0]melody_length;
-    reg[31:0]  stop;
-    reg[31:0]  time_value;
+ reg[31:0]  stop;// silence time
+ reg[31:0]  time_value;// play time
     reg[1:0] modes;
-    reg[31:0] gap_time;
+ reg[31:0] gap_time;// The diffenent time between player and the standard time
 
 
     LED led(clk,modes,present_song,frequency,an,led_light);
@@ -73,7 +73,7 @@ module Automusic(
 
     
     always @(posedge clk,negedge reset) begin
-        if (last_song!=present_song||lastMemory!=isMemory) begin
+     if (last_song!=present_song||lastMemory!=isMemory) begin //when change song,initiate
            lastMemory<=isMemory;
             last_song=present_song;
             case (present_song)
@@ -89,7 +89,7 @@ module Automusic(
             outaddress<=0;
         end
         //how to stop?
-        if(isAuto==1'b0&&isEnd==1'b0) modes<=learn;
+     if(isAuto==1'b0&&isEnd==1'b0) modes<=learn; // The learning part
         else if(isAuto==1'b1&&isMemory==1'b1) modes<=memory;
         else if(isAuto==1'b1&&isMemory==1'b0) modes<=auto;
         else if(isAuto==1'b0&&isEnd==1'b1)begin
