@@ -25,29 +25,89 @@ input clk,
 input [6:0] notes,
 input ishigher,
 input islower,
-input stopLoad
+//input stopLoad,
+input isMemory,
+input reset,
+input enable,
+//output wire SS,
+//output wire MM,
+//output wire [31:0]TV,
+//output wire [31:0]TVC,
+//output wire [31:0]ST,
+output wire[13:0] outad,
+output wire[13:0]inad,
+output wire [13:0] addressA,
+//output wire [31:0] freA,
+//output wire [31:0]out1,
+//output wire h,
+output reg[31:0] fre,
+output reg [3:0]an,
+output reg [6:0]ledlight,
+output reg [6:0]light,
+output reg pwm
     );
-    `include "parameter_project.v";
-    reg[6:0] my_memory[99:0];
-    reg[3:0] num[0:0];
-    reg index=0;
-    reg [31:0]frequency;
-    reg [31:0]last_frequency;
-    reg[31:0] tv_count=0;
+    `include "parameter_project.v"
     
-        
 
+
+
+reg [31:0] frequency;
+wire [31:0] outfre;
+reg[13:0] address;
+reg[13:0] inaddress=0;
+wire trueWea;
+
+wire [6:0]inledlight;
+wire [3:0]inan;
+wire inpwm;
+wire [6:0]inlight;
+
+wire [6:0]outledlight;
+wire [3:0]outan;
+wire outpwm;
+wire [6:0]outlight;
+
+
+    RAM ram (
+        .clka(clk), // input wire clka
+        .wea(trueWea), // input wire [0 : 0] wea
+        .addra(address), // input wire [13 : 0] addra
+        .dina(frequency), // input wire [31 : 0] dina
+         .douta(outfre)// output wire [31 : 0] douta
+        );
+    reg [13:0]outaddress=1;
+    music freeMusic(.reset(reset),.clk(clk),.notes(notes),.islower(islower),.ismemory(true)
+    ,.ishigher(ishigher),.isdefine(false),.light(inlight),.ledlight(inledlight),.an(inan),.pwm(inpwm));
     
+    Buzz buzz(.clk(clk),.frequency(outfre),.pwm(outpwm),.reset(reset),.modechange(false));
+    LED led(.clk(clk),.mode(memory),.num(2'b11),.fre(outfre),.an(outan),.a_g(outledlight));
     
+//    Automusic autoM(.reset(reset),.clk(clk),.lights(outlight),.led_light(outledlight),.an(outan),.pwm(outpwm)
+//    ,.isMatch(false),.isAuto(1'b1),.isMemory(~trueWea),.outaddress(outaddress),.outfre(outfre)
+////    ,  .frequency(freA),.h(h),.MM(MM),.SS(SS)
+////,.ST(ST)
+////,.TV(TV),.TVC(TVC)
+//    );
+    assign trueWea=(enable==1'b1&&isMemory==1'b1);
+    assign outad=outaddress;
+    assign inad=inaddress;
+    assign addressA=address;
+    reg[31:0] cnt=0;
+always@(posedge clk) begin
+if(cnt<=125*100000*4) begin
+cnt<=cnt+1;
+end
+else begin
+outaddress<=outaddress+1;
+cnt<=0;
+end
+
+end
+
+
     always @(*) begin
-    if(stopLoad==1'b1) begin
-    $readmemh("num_library",num);
-    $fwrite("music_library"+num[0],my_memory);
-    $fwrite("num_library",num);
-    end
-    end
-    
-    always @(ishigher,islower,notes) begin
+    if(enable==1'b1&&isMemory==1'b1) begin
+           inaddress=inaddress+1'b1;
             if (!ishigher&&!islower) begin
                     case (notes)
             7'b1000000:frequency=do;
@@ -57,6 +117,7 @@ input stopLoad
             7'b0000100:frequency=sol;
             7'b0000010:frequency=la;    
             7'b0000001:frequency=si;
+            default frequency=0;
                 endcase  
             end
             else if (ishigher&&!islower) begin
@@ -68,6 +129,7 @@ input stopLoad
             7'b0000100:frequency=sol_high;
             7'b0000010:frequency=la_high;
             7'b0000001:frequency=si_high;
+            default frequency=0;
                 endcase
             end
             else if (!ishigher&&islower) begin
@@ -79,98 +141,29 @@ input stopLoad
             7'b0000100:frequency=sol_low;
             7'b0000010:frequency=la_low;
             7'b0000001: frequency=si_low;
+            default frequency=0;
                 endcase
             end
+            end
+         
          end
     
-    
-    always@(posedge clk) begin
-    if(last_frequency!=frequency) begin
-    if(tv_count<=time_value_16) begin
-            case(last_frequency)
-            do:my_memory[index]=6'b001111;
-            re:my_memory[index]=6'b010000;
-            mi:my_memory[index]=6'b010001;
-            fa:my_memory[index]=6'b010010;
-            sol:my_memory[index]=6'b010011;
-            la:my_memory[index]=6'b010100;
-            si:my_memory[index]=6'b010101;
-            do_low:my_memory[index]=6'b100100;
-            re_low:my_memory[index]=6'b100101;
-            mi_low:my_memory[index]=6'b100110;
-            fa_low:my_memory[index]=6'b100111;
-            sol_low:my_memory[index]=6'b101000;
-            la_low:my_memory[index]=6'b101001;
-            si_low:my_memory[index]=6'b101010;
-            do_high:my_memory[index]=6'b111001;
-            re_high:my_memory[index]=6'b111010;
-            mi_high:my_memory[index]=6'b111011;
-            fa_high:my_memory[index]=6'b111100;
-            sol_high:my_memory[index]=6'b111101;
-            la_high:my_memory[index]=6'b111110;
-            si_high:my_memory[index]=6'b111111;
-            default
-            my_memory[index]=6'b000000;
-            endcase
-            end
-            else if(time_value_16<tv_count&&tv_count<=time_value_8)begin
-            case(last_frequency)
-                    do:my_memory[index]=6'b000001;
-                    re:my_memory[index]=6'b000010;
-                    mi:my_memory[index]=6'b000011;
-                    fa:my_memory[index]=6'b000100;
-                    sol:my_memory[index]=6'b000101;
-                    la:my_memory[index]=6'b000110;
-                    si:my_memory[index]=6'b000111;
-                    do_low:my_memory[index]=6'b010110;
-                    re_low:my_memory[index]=6'b010111;
-                    mi_low:my_memory[index]=6'b011000;
-                    fa_low:my_memory[index]=6'b011001;
-                    sol_low:my_memory[index]=6'b011010;
-                    la_low:my_memory[index]=6'b011011;
-                    si_low:my_memory[index]=6'b011100;
-                    do_high:my_memory[index]=6'b101011;
-                    re_high:my_memory[index]=6'b101100;
-                    mi_high:my_memory[index]=6'b101101;
-                    fa_high:my_memory[index]=6'b101110;
-                    sol_high:my_memory[index]=6'b101111;
-                    la_high:my_memory[index]=6'b110000;
-                    si_high:my_memory[index]=6'b110001;          
-                    default
-                    my_memory[index]=6'b000000;
-                    endcase
-                    end
-          else if(time_value_8<tv_count)begin
-                    case(last_frequency)
-                    do:my_memory[index]=6'b001000;
-                    re:my_memory[index]=6'b001001;
-                    mi:my_memory[index]=6'b001010;
-                    fa:my_memory[index]=6'b001011;
-                   sol:my_memory[index]=6'b001100;
-                    la:my_memory[index]=6'b001101;
-                    si:my_memory[index]=6'b001110;
-                    do_low:my_memory[index]=6'b011101;
-                    re_low:my_memory[index]=6'b011110;
-                    mi_low:my_memory[index]=6'b011111;
-                    fa_low:my_memory[index]=6'b100000;
-                    sol_low:my_memory[index]=6'b100001;
-                    la_low:my_memory[index]=6'b100010;
-                    si_low:my_memory[index]=6'b100011;
-                    do_high:my_memory[index]=6'b110010;
-                    re_high:my_memory[index]=6'b110011;
-                    mi_high:my_memory[index]=6'b110100;
-                    fa_high:my_memory[index]=6'b110101;
-                    sol_high:my_memory[index]=6'b110110;
-                    la_high:my_memory[index]=6'b110111;
-                    si_high:my_memory[index]=6'b111000;                              
-               endcase
-           end
-           tv_count=0;
-           last_frequency=frequency;
-           end
-           else begin
-           tv_count<=tv_count+1;
-           end
-    end    
-    
+    always @(posedge clk) begin
+    if(trueWea==1'b1) begin
+    an=inan;
+    ledlight=inledlight;
+    light=inlight;
+    pwm=inpwm;
+    address=inaddress;
+    fre=frequency;
+    end
+    else begin
+    an=outan;
+    ledlight=outledlight;
+    light=outlight;
+    pwm=outpwm;
+    address=outaddress;
+    fre=outfre;
+    end
+    end
 endmodule
