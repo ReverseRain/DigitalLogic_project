@@ -23,13 +23,13 @@
 module music(
 input clk,
 input reset,
-input [6:0] notes,
+    input [6:0] notes, //the nodes player play
 input ishigher,
 input islower,
 input isdefine,
 input ismemory,
 //input isLoad,
-output  pwm,
+output  pwm,//the sound signal
 output [3:0] an,
 output reg[6:0]light,
 output [6:0]ledlight
@@ -54,7 +54,7 @@ output [6:0]ledlight
    end
    else
    mode=free;
-   end 
+   end  //change mode
       
     always @(*) begin
         if (!ishigher&&!islower) begin
