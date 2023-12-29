@@ -22,15 +22,14 @@
 
 module LED(
     input clk,
-    input[1:0] mode,
+    input[2:0] mode,
     input[1:0] num,
     input[31:0] fre,
     output reg[3:0] an,
     output reg[6:0] a_g//bond a to g from left to right
 
-
     );
-    `include "parameter_file.v"
+    `include "parameter_project.v"
     reg[18:0] clkdiv=0;
     reg[3:0] display;// the code of the thing displayed on the LED
     always @(posedge clk ) begin
@@ -54,16 +53,16 @@ module LED(
         if (sign==2'b00) begin
             case(mode)
              free: display=4'd7;
-             auto: display=4'd8;
              learn: display=4'd9;
-             select: display=4'd4;
+             auto: display=4'd8;
+             define:display=4'd13;
+             select:display=4'd4;
+             memory:display=4'd11;
              default:display=4'd12;
             endcase
-
-            
         end
         else if (sign==2'b01) begin
-            if (mode==auto) begin
+            if (mode==auto||mode==learn) begin
                 case(num)
              song1: display=4'd0;
              song2: display=4'd1;
@@ -72,22 +71,17 @@ module LED(
 
             endcase
             end
-            else if (mode==select) begin
-                display=4'd13;
-            end
-            else begin
-                 display=4'd12;
-            end
-               
+//            else if(mode==learn)begin
+//            case(num)
+//            endcase
+//            end
+            else
+            display=4'd12;
             
             
         end
         else if (sign==2'b10) begin
-            if (mode==select) begin
-                display=4'd9;
-            end
-            else begin
-                case(fre)
+            case(fre)
             do,do_high,do_low: display=4'd0;
             re,re_high,re_low: display=4'd1;
             mi,mi_high,mi_low: display=4'd2;
@@ -98,22 +92,15 @@ module LED(
             default:display=4'd12;
 
             endcase
-            end
-            
             
         end
         else if (sign==2'b11) begin
-            if (mode==select) begin
-                display=4'd13;
-            end
-            else begin
-               case(fre)
+            case(fre)
             do,re,mi,fa,sol,la,si:display=4'd11;
             do_low,re_low,mi_low,fa_low,sol_low,la_low,si_low:display=4'd9;
             do_high,re_high,mi_high,fa_high,sol_high,la_high,si_high:display=4'd10;
             default:display=4'd12;
-            endcase 
-            end
+            endcase
             
         end
 
@@ -128,12 +115,12 @@ module LED(
         4'd5:a_g=7'b1011111;//6
         4'd6:a_g=7'b1110000;//7
         4'd7:a_g=7'b1000111;//F
-        4'd8:a_g=7'b1100111;//A
+        4'd8:a_g=7'b1110111;//A
         4'd9:a_g=7'b0001110;//L
         4'd10:a_g=7'b0110111;//H
         4'd11:a_g=7'b0000001;//-
-        4'd12:a_g=7'b1111110;//0
-        4'd13:a_g=7'b1001111;//E   
+        4'd12:a_g=7'b1111110;//0   
+        4'd13:a_g=7'b0111101;//d
         
             default:a_g=7'b1111110;//0 
         endcase
