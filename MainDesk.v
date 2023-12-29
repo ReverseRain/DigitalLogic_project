@@ -30,29 +30,28 @@ module MainDesk(
     input [6:0] notes,
     input ishigher,
     input islower,
+    input confirm,
     output reg pwm,
-    output reg o=0,
     output reg[6:0] light,
     output reg[3:0] an,
     output reg[6:0]ledlight 
     );
-     `include "parameter_file.v"
+     `include "parameter_project.v"
+     
+     reg divclk=0;
+        reg[31:0] count=0;
+        always @(posedge clk ) begin
+            if (count<=500000) begin
+             count=count+1;
+            end
+            else begin
+             divclk=~divclk;
+             count=0;      
+            end
+        end
 
-   reg divclk=0;
-   reg[31:0] count=0;
-   always @(posedge clk ) begin
-       if (count<=500000) begin
-        count=count+1;
-       end
-       else begin
-        divclk=~divclk;
-        count=0;      
-       end
-   end
 
-  
-
-   reg rq1=0;
+    reg rq1=0;
    reg rq2=0;
    reg lq1=0;
    reg lq2=0;
@@ -62,84 +61,125 @@ module MainDesk(
    reg dq2=0;
 
    always @(posedge divclk) begin
-      rq1=right;
+      rq1<=right;
+      rq2<=rq1;
    end
 
-   always @(posedge divclk) begin
-      rq2=rq1;
-   end
+   
 
     assign  right_posedge = rq1& ~rq2;
 
     always @(posedge divclk) begin
-      lq1=left;
+      lq1<=left;
+      lq2<=lq1;
    end
 
-   always @(posedge divclk) begin
-      lq2=lq1;
-   end
+   
 
     assign  left_posedge = lq1& ~lq2;
 
     always @(posedge divclk) begin
-      uq1=up;
+      uq1<=up;
+      uq2<=uq1;
    end
 
-   always @(posedge divclk) begin
-      uq2=uq1;
-   end
+   
 
     assign  up_posedge = uq1& ~uq2;
 
     always @(posedge divclk) begin
-      dq1=down;
+      dq1<=down;
+      dq2<=dq1;
    end
 
-   always @(posedge divclk) begin
-      dq2=dq1;
-   end
+   
 
     assign  down_posedge = dq1& ~dq2;
+    
+    reg [2:0] state;
+          reg [2:0] nextstate;
+          reg [1:0] nextsong_num;
+          reg [1:0]song_num;
+    
+          always @(posedge divclk ,negedge reset) begin
+            if (!reset) begin
+              state<=3'b000;
+              nextstate<=3'b000;
+            end
+            else begin
+               if (right_posedge) begin
+             case(state)
+            3'b000: nextstate<=3'b001;
+            3'b001: nextstate<=3'b010;
+            3'b010: nextstate<=3'b011;
+            3'b011: nextstate<=3'b100; 
+            3'b100: nextstate<=3'b101;
+            3'b101: nextstate<=3'b000;           
+            endcase
+          end
+          else if (left_posedge) begin
+              case(state)
+            3'b101: nextstate<=3'b100;
+            3'b100: nextstate<=3'b011;
+            3'b011: nextstate<=3'b010;
+            3'b010: nextstate<=3'b001;
+            3'b001: nextstate<=3'b000;
+            3'b000: nextstate<=3'b101;
+            endcase
+          end
+             state<=nextstate;
+    
+            end
+        
+          end
+    
+          always @(posedge divclk ,negedge reset) begin
+            if (!reset) begin
+              song_num<=song1;
+              nextsong_num<=song1;
+            end
+            else begin
+               if (state==3'b010||state==3'b011) begin
+            if (down_posedge) begin
+               case (song_num)
+                    song1: nextsong_num<=song2;
+                    song2: nextsong_num<=song3;
+                    song3: nextsong_num<=song1;
+                    default: nextsong_num<=song1; 
+                endcase
+            end
+            else if (up_posedge) begin
+              case (song_num)
+                    song1: nextsong_num<=song3;
+                    song2: nextsong_num<=song1;
+                    song3: nextsong_num<=song2;
+                    default: nextsong_num<=song1; 
+                endcase
+            end
+    
+           end
+              song_num<=nextsong_num;
+    
+            end
+            
+          end
 
-    // reg[1:0] checkRight=2'b00;
-    // always @(posedge divclk ) begin
-    //    checkRight<={checkRight[0],right};
-    // end
-    // assign  right_posedge = ~checkRight[1] & checkRight[0];
-
-    // reg[1:0] checkLeft=2'b00;
-    // always @(posedge divclk ) begin
-    //    checkLeft<={checkLeft[0],left};
-    // end
-    // assign  left_posedge = ~checkLeft[1] & checkLeft[0];
-
-    // reg[1:0] checkUp=2'b00;
-    // always @(posedge divclk ) begin
-    //    checkUp<={checkUp[0],up};
-    // end
-    // assign  up_posedge = ~checkUp[1] & checkUp[0];
-
-    // reg[1:0] checkDown=2'b00;
-    // always @(posedge divclk ) begin
-    //    checkDown<={checkDown[0],down};
-    // end
-    // assign  down_posedge = ~checkDown[1] & checkDown[0];
-
-    // reg[1:0] checkReset=2'b00;
-    // always @(posedge divclk ) begin
-    //    checkReset<={checkReset[0],reset};
-    // end
-    // assign  reset_posedge = ~checkReset[1] & checkReset[0];
+    
+    
 
 
-     wire freepwm;
+ 
+
+    
+    
+      wire freepwm;
       wire [3:0] freean;
       wire [6:0] freelight;
       wire [6:0] freeledlight;
 
-      reg isMatch=0;
-      reg isAuto=1;
-      reg [1:0]song_num;
+//      reg isMatch=1'b0;
+//      reg isAuto=1'b1;
+      
       wire autoisHight;
       wire autoisLow;
       wire [3:0]autoan;
@@ -152,182 +192,107 @@ module MainDesk(
       wire [6:0]selectledlight;
       wire [6:0]selectlight;
 
-
-
-
-
-      reg [1:0] state;
-      reg [1:0] nextstate;
-      reg [1:0] nextsong_num;
-
-      always @(posedge clk ,negedge reset) begin
-        if (!reset) begin
-          state<=2'b00;
-          nextstate<=2'b00;
-        end
-        else begin
-           if (right_posedge) begin
-         case(state)
-        2'b00: nextstate<=2'b01;
-        2'b01: nextstate<=2'b10;
-        2'b10: nextstate<=2'b00;
-        endcase
-      end
-      else if (left_posedge) begin
-          case(state)
-        2'b00: nextstate<=2'b10;
-        2'b01: nextstate<=2'b00;
-        2'b10: nextstate<=2'b01;
-        endcase
-      end
-
-
-         state<=nextstate;
-
-
-
-
-        end
-    
-      end
-
-      always @(posedge clk ,negedge reset) begin
-        if (!reset) begin
-          song_num<=song1;
-          nextsong_num<=song1;
-        end
-        else begin
-           if (state==2'b10) begin
-        if (down_posedge) begin
-           case (song_num)
-                song1: nextsong_num=song2;
-                song2: nextsong_num=song3;
-                song3: nextsong_num=song1;
-                default: nextsong_num=song1; 
-            endcase
-        end
-        else if (up_posedge) begin
-          case (song_num)
-                song1: nextsong_num=song3;
-                song2: nextsong_num=song1;
-                song3: nextsong_num=song2;
-                default: nextsong_num=song1; 
-            endcase
-        end
-
-       end
-          song_num<=nextsong_num;
-
-        end
-        
-      end
-
-    
-          
-         
-         
-    
-
-
-    // always @(*) begin
-    //   if (reset_posedge) begin
-    //       state=2'b00;
-        
-          
-    //   end
-    //   else if (right_posedge) begin
-    //      case(state)
-    //     2'b00: state=2'b01;
-    //     2'b01: state=2'b10;
-    //     2'b10: state=2'b00;
-    //    // 2'b11: state=2'b00;
-    //     endcase
-    //   end
-    //   else if (left_posedge) begin
-    //      case(state)
-    //     2'b00: state=2'b11;
-    //     2'b01: state=2'b00;
-    //     2'b10: state=2'b00;
-    //    // 2'b11: state=2'b10;
-    //     endcase
-    //   end
-
-
+      wire learnpwm;
+      wire [3:0]learnan;
+      wire [6:0]learnledlight;
+      wire [6:0]learnlight;
       
-
-    //    end
-
-
-
-
-  
-    wire modechange;
-    assign modechange=right_posedge|left_posedge;
-
- 
-
-  
-
-    music freemode(.clk(clk),.notes(notes),.ishigher(ishigher),.islower(islower),.pwm(freepwm),.an(freean),.light(freelight),.ledlight(freeledlight),.reset(reset),.modechange(modechange));
-    Automusic automode(.clk(clk),.isMatch(isMatch),.isAuto(isAuto),.present_song(song_num),.an(autoan),.led_light(autoledlight),.lights(autolight),.pwm(autopwm),.reset(reset),.modechange(modechange));
+     wire definepwm;
+    wire [3:0]definean;
+     wire [6:0]defineledlight;
+      wire [6:0]definelight;
+      reg enable;
+      
+      wire memorypwm;
+      wire [3:0]memoryan;
+      wire [6:0]memoryledlight;
+      wire [6:0]memorylight;
+      reg memoryenable;
+      
+      wire modechange;
+          assign modechange=right_posedge|left_posedge;
+      
+    music freemode(.clk(clk),.notes(notes),.ishigher(ishigher),.islower(islower),.pwm(freepwm),.an(freean),.light(freelight),.isdefine(false),.ledlight(freeledlight),.reset(reset),.ismemory(false));
+    Automusic automode(.clk(clk),.isMatch(false),.isAuto(true),.present_song(song_num),.an(autoan),.led_light(autoledlight),.lights(autolight),.pwm(autopwm),.reset(reset),.modechange(modechange),.isMemory(false),.outfre(0));
     Selectmode selectmode(.clk(clk),.pwm(selectpwm),.an(selectan),.ledlight(selectledlight),.light(selectlight));
-
+    learning learnMachain(.clk(clk),.present_song(song_num),.play(notes),.reset(reset),.ishigher(ishigher),.islower(islower),.an(learnan),.led_light(learnledlight),.lights(learnlight),.pwm(learnpwm),.modechange(modechange));
+    definite definemode(.confirm(confirm),.clk(clk),.play(notes),.ishigher(ishigher),.islower(islower),.reset(reset),.an(definean),.led_light(defineledlight),.lights(definelight),.pwm(definepwm),.enable(enable));
+    memory memorymode(.clk(clk),.notes(notes),.ishigher(ishigher),.islower(islower),.reset(reset),.enable(confirm),.an(memoryan),.ledlight(memoryledlight),.light(memorylight),.pwm(memorypwm),.isMemory(memoryenable));
+    
     always @(state) begin
         case (state)
-          2'b00 : begin
+          3'b000 : begin
             pwm=selectpwm;
             light=selectlight;
             ledlight=selectledlight;
             an=selectan;
-            
+            enable=false;
+            memoryenable=false;
           end
-          2'b01: begin
+          3'b001: begin
             pwm=freepwm;
             light=freelight;
             ledlight=freeledlight;
             an=freean;
-            
+            enable=false;
+            memoryenable=false;
           end
-          2'b10: begin
+          3'b010: begin
             pwm=autopwm;
             light=autolight;
             ledlight=autoledlight;
             an=autoan;
-            
+            enable=false;
+            memoryenable=false;
           end
-          2'b11: begin
-            
+          3'b011: begin
+            pwm=learnpwm;
+            light=learnlight;
+            ledlight=learnledlight;
+            an=learnan;
+            enable=false;
+            memoryenable=false;
           end
-             
+          3'b100: begin
+          pwm=definepwm;
+          light=definelight;
+          ledlight=defineledlight;
+          an=definean;
+          enable=true;
+          memoryenable=false;
+          end 
+          3'b101:begin
+          pwm=memorypwm;
+          light=memorylight;
+          ledlight=memoryledlight;
+          an=memoryan;
+          enable=false;
+          memoryenable=true;
+          end  
         endcase
     end
 
-    // always @(*) begin
-    //   if (reset_posedge) begin
-    //     song_num=song1;
-    //   end
+//    always @(*) begin
+//       if (state==2'b10) begin
+//        if (up_posedge) begin
+//           case (song_num)
+//                song1: song_num=song2;
+//                song2: song_num=song3;
+//                song3: song_num=song1;
+//                default: song_num=song1; 
+//            endcase
+//        end
+//        else if (down_posedge) begin
+//          case (song_num)
+//                song1: song_num=song3;
+//                song2: song_num=song1;
+//                song3: song_num=song2;
+//                default: song_num=song1; 
+//            endcase
+//        end
 
-
-    //    if (state==2'b10) begin
-    //     if (up_posedge) begin
-    //        case (song_num)
-    //             song1: song_num=song2;
-    //             song2: song_num=song3;
-    //             song3: song_num=song1;
-    //             default: song_num=song1; 
-    //         endcase
-    //     end
-    //     else if (down_posedge) begin
-    //       case (song_num)
-    //             song1: song_num=song3;
-    //             song2: song_num=song1;
-    //             song3: song_num=song2;
-    //             default: song_num=song1; 
-    //         endcase
-    //     end
-
-    //    end
-    // end
+//       end
+//    end
 
     
     
