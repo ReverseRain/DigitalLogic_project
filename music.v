@@ -26,28 +26,37 @@ input reset,
 input [6:0] notes,
 input ishigher,
 input islower,
+input isdefine,
+input ismemory,
+//input isLoad,
 output  pwm,
 output [3:0] an,
-output reg[6:0]light=0,
+output reg[6:0]light,
 output [6:0]ledlight
     );
-    `include "parameter_file.v"
+    `include "parameter_project.v"
    
 
 
     reg[31:0] frequency;
     reg[31:0] count=0;
-    reg[1:0] mode=free;
-    reg[1:0] num=2'b00;
+    reg[2:0] mode;
+    reg[1:0] num=2'b11;
     LED led(clk,mode,num,frequency,an,ledlight);
     Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset));
-     
-    
+//    memory memory(.clk(clk),.notes(notes),.ishigher(ishigher),.islower(islower),.stopLoad(stopLoad),.reset(reset)); 
+   always@(posedge clk)begin
+   if(isdefine==1'b1) begin
+   mode=define;
+   end
+   else if(ismemory==1'b1) begin
+   mode=memory;
+   end
+   else
+   mode=free;
+   end 
       
-   
-
     always @(*) begin
-       
         if (!ishigher&&!islower) begin
                 case (notes)
         7'b1000000:frequency=do; 
@@ -122,6 +131,6 @@ output [6:0]ledlight
     end
 
 
-
-
 endmodule
+
+
