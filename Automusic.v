@@ -25,11 +25,17 @@ module Automusic(
  input  reset,
  input modechange,
  
+ 
+
+ 
  output pwm,
- output reg o=1'b0,
+
+ input [31:0]outfre,
  input isMatch,
  input isAuto,
+ input isMemory,
  input [1:0]present_song,// the song number
+  output reg[13:0]outaddress=0,
   output reg isHight,
   output reg isLow,
   output [3:0] an,
@@ -37,12 +43,6 @@ module Automusic(
   output reg[6:0]  lights,
   output reg[31:0] index,
 
-//  output reg[31:0] index=0,
-//  output reg isSlience=1'b1,
-//  output reg[31:0] tv_count=0,
-//  output integer time_value=50,
-//  output reg [31:0]melody_length,
-//  output integer  stop=10,
   output reg isEnd
 //  output reg[31:0] frequency
  
@@ -69,55 +69,58 @@ module Automusic(
     LED led(clk,modes,present_song,frequency,an,led_light);
     Buzz buzz(.clk(clk),.frequency(frequency),.pwm(pwm),.reset(reset),.modechange(modechange));
 
-    reg[1:0] last_song;
-    
+    reg[1:0] last_song;reg lastMemory;
 
     
     always @(posedge clk,negedge reset) begin
-        if (last_song!=present_song) begin
+        if (last_song!=present_song||lastMemory!=isMemory) begin
+           lastMemory<=isMemory;
             last_song=present_song;
             case (present_song)
-               song1: begin melody_length=littleStar_length;melody=littleStar; end
-               song2:begin melody_length=happyBirthday_length;melody=happyBirthday;end
-               song3:begin melody_length=happiness_length;melody=happiness; end
+               song1: begin melody_length<=littleStar_length;melody<=littleStar; end
+               song2:begin melody_length<=happyBirthday_length;melody<=happyBirthday;end
+               song3:begin melody_length<=happiness_length;melody<=happiness; end
             endcase
-            gap_time=0;
-            tv_count=0;
-            index=0;     
-            isEnd=1'b0;
-            isSlience=1'b1;
+            gap_time<=0;
+            tv_count<=0;
+            index<=0;     
+            isEnd<=1'b0;
+            isSlience<=1'b1;
+            outaddress<=0;
         end
         //how to stop?
         if(isAuto==1'b0&&isEnd==1'b0) modes=learn;
-        else if(isAuto==1'b1) modes=auto;
+        else if(isAuto==1'b1&&isMemory==1'b1) modes=memory;
+        else if(isAuto==1'b1&&isMemory==1'b0) modes=auto;
         else if(isAuto==1'b0&&isEnd==1'b1)begin
         if(gap_time<900000000)
-        modes=auto;
+        modes=select;
         else if(gap_time<2000000000)
-        modes=free;
+        modes=auto;
         else
-        modes=learn;
+        modes=free;
         end
         if (modechange) begin
-             tv_count=0;
-            index=0;     
-            isEnd=1'b0;
-            isSlience=1'b1;
-            melody_length=littleStar_length;
-            melody=littleStar;
-            last_song=song1;
-            gap_time=0;
+             tv_count<=0;
+            index<=0;     
+            isEnd<=1'b0;
+            isSlience<=1'b1;
+            melody_length<=littleStar_length;
+            melody<=littleStar;
+            last_song<=song1;
+            gap_time<=0;
+            outaddress<=0;
         end
 
-
         if (!reset) begin
-            tv_count=0;
-            index=0;     
-            isEnd=1'b0;
-            isSlience=1'b1;
-            melody_length=littleStar_length;
-            melody=littleStar;
-            last_song=song1;
+            tv_count<=0;
+            index<=0;     
+            isEnd<=1'b0;
+            isSlience<=1'b1;
+            melody_length<=littleStar_length;
+            melody<=littleStar;
+            last_song<=song1;
+            outaddress<=0;
         end
         else begin
             if (index>=melody_length) isEnd<=1'b1;
@@ -126,27 +129,30 @@ module Automusic(
         if (!isEnd) begin
             if (tv_count<stop) begin
                 isSlience<=1'b1;
+                tv_count<=tv_count+1'b1;
             end
             else if (tv_count>=stop&&tv_count<time_value) begin
                 isSlience<=1'b0;
+                tv_count<=tv_count+1'b1;
             end
             else if(tv_count>=time_value) begin
                 tv_count=32'h0000;
-                index=index+1'b1;                                       
+                index=index+1'b1;  
+                if(isMemory==1'b1) begin
+                outaddress<=outaddress+1'b1;
+                 end                                     
             end     
         end
         else if(isAuto==1'b1) begin
-            tv_count=0;
-            index=0;     
-            isEnd=1'b0;
-            isSlience=1'b1;
+            tv_count<=0;
+            index<=0;     
+            isEnd<=1'b0;
+            isSlience<=1'b1;
         end
       else if(isAuto==1'b0) begin
-      tv_count=0;
-      index=0;
-      isSlience=1'b1;
+      isSlience<=1'b1;
       end
-        tv_count<=tv_count+1'b1;
+       
 end
 else if(isMatch==1'b0&&isAuto==1'b0)begin
 gap_time<=gap_time+1;
@@ -158,10 +164,9 @@ gap_time<=gap_time+1;
     always @(*) begin
         if (isSlience) begin
             frequency=0;
-            // stop=10;
-            // time_value=50;
         end
         else begin
+        if(isMemory==1'b0) begin
             case (melody[index*6+5-:6])
             6'd0: begin frequency=0;stop=stop_value_8;time_value=time_value_8;    end  //000000
             6'd1: begin frequency=do;stop=stop_value_8;time_value=time_value_8;    end  //000001
@@ -228,7 +233,11 @@ gap_time<=gap_time+1;
             6'd62: begin frequency=la_high;stop=stop_value_16;time_value=time_value_16;   end //111110
             6'd63: begin frequency=si_high;stop=stop_value_16;time_value=time_value_16;   end//111111
             endcase
-           
+           end
+           else if(isMemory==1'b1) begin
+           frequency=outfre;
+           stop=stop_value_4;time_value=time_value_4;
+           end
         case(frequency)
              0:begin lights=7'b0000000; isHight=1'b0;isLow=1'b0;end
             do:begin lights=7'b1000000; isHight=1'b0;isLow=1'b0;end
@@ -252,8 +261,7 @@ gap_time<=gap_time+1;
             sol_low:begin lights=7'b0000100;  isHight=1'b0;isLow=1'b1; end
             la_low:begin lights=7'b0000010;  isHight=1'b0;isLow=1'b1; end
             si_low:begin lights=7'b0000001;  isHight=1'b0;isLow=1'b1; end
-            endcase 
-//            true_frequency=frequency;   
+            endcase  
         end
         
     end
