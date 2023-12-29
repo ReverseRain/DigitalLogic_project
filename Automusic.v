@@ -75,7 +75,7 @@ module Automusic(
     always @(posedge clk,negedge reset) begin
      if (last_song!=present_song||lastMemory!=isMemory) begin //when change song,initiate
            lastMemory<=isMemory;
-            last_song=present_song;
+            last_song<=present_song;
             case (present_song)
                song1: begin melody_length<=littleStar_length;melody<=littleStar; end
                song2:begin melody_length<=happyBirthday_length;melody<=happyBirthday;end
