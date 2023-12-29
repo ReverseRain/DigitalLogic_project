@@ -50,7 +50,7 @@ module LED(
     end
 
     always @(*) begin
-        if (sign==2'b00) begin
+        if (sign==2'b00) begin // the 1st led
             case(mode)
              free: display=4'd7;
              learn: display=4'd9;
@@ -61,7 +61,7 @@ module LED(
              default:display=4'd12;
             endcase
         end
-        else if (sign==2'b01) begin
+        else if (sign==2'b01) begin // the 2nd led
             if (mode==auto||mode==learn) begin
                 case(num)
              song1: display=4'd0;
@@ -80,7 +80,7 @@ module LED(
             
             
         end
-        else if (sign==2'b10) begin
+        else if (sign==2'b10) begin// the 3rd led
             case(fre)
             do,do_high,do_low: display=4'd0;
             re,re_high,re_low: display=4'd1;
@@ -94,7 +94,7 @@ module LED(
             endcase
             
         end
-        else if (sign==2'b11) begin
+                else if (sign==2'b11) begin //the 4th led
             case(fre)
             do,re,mi,fa,sol,la,si:display=4'd11;
             do_low,re_low,mi_low,fa_low,sol_low,la_low,si_low:display=4'd9;
