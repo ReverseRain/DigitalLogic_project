@@ -89,16 +89,16 @@ module Automusic(
             outaddress<=0;
         end
         //how to stop?
-        if(isAuto==1'b0&&isEnd==1'b0) modes=learn;
-        else if(isAuto==1'b1&&isMemory==1'b1) modes=memory;
-        else if(isAuto==1'b1&&isMemory==1'b0) modes=auto;
+        if(isAuto==1'b0&&isEnd==1'b0) modes<=learn;
+        else if(isAuto==1'b1&&isMemory==1'b1) modes<=memory;
+        else if(isAuto==1'b1&&isMemory==1'b0) modes<=auto;
         else if(isAuto==1'b0&&isEnd==1'b1)begin
         if(gap_time<900000000)
-        modes=select;
+        modes<=select;
         else if(gap_time<2000000000)
-        modes=auto;
+        modes<=auto;
         else
-        modes=free;
+        modes<=free;
         end
         if (modechange) begin
              tv_count<=0;
